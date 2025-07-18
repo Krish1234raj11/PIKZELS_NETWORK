@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIKZELS NETWORK - Premium Minecraft Server</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .minecraft-font {
+            font-family: 'Orbitron', monospace;
+        }
+
+        .pixel-border {
+            border: 4px solid #4ade80;
+            border-image: url("data:image/svg+xml,%3csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3e%3cdefs%3e%3cpattern id='pixel' x='0' y='0' width='10' height='10' patternUnits='userSpaceOnUse'%3e%3crect width='10' height='10' fill='%234ade80'/%3e%3c/pattern%3e%3c/defs%3e%3crect width='100' height='100' fill='url(%23pixel)'/%3e%3c/svg%3e") 4;
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glow-effect:hover {
+            box-shadow: 0 0 30px rgba(74, 222, 128, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .minecraft-bg {
+            background: linear-gradient(45deg, #2d5a27 25%, transparent 25%), 
+                        linear-gradient(-45deg, #2d5a27 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #2d5a27 75%), 
+                        linear-gradient(-45deg, transparent 75%, #2d5a27 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .cube {
+            width: 50px;
+            height: 50px;
+            background: #4ade80;
+            animation: rotate 2s infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 5% auto;
+            padding: 30px;
+            border: 2px solid #4ade80;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(74, 222, 128, 0.3);
+        }
+
+        .stats-card {
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            border-color: #4ade80;
+            transform: translateY(-5px);
+        }
+
+        .crate-item {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #4ade80;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .crate-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(74, 222, 128, 0.3);
+        }
+
+        .navbar-glass {
+            background: rgba(26, 26, 46, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .server-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .payment-method {
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .payment-method:hover,
+        .payment-method.selected {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #059669, #34d399);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #dc2626, #f87171);
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #4ade80;
+            animation: float 6s infinite ease-in-out;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            10%, 90% { opacity: 0.7; }
+            50% { transform: translateY(-100px) rotate(180deg); }
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, #4ade80, #22d3ee, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="cube"></div>
+        <h2 class="minecraft-font text-2xl text-green-400">Loading PIKZELS NETWORK...</h2>
+        <div class="mt-4 w-64 bg-gray-700 rounded-full h-2">
+            <div class="bg-green-400 h-2 rounded-full" style="width: 0%" id="loadingBar"></div>
+        </div>
+    </div>
+
+    <!-- Particles -->
+    <div id="particles" class="fixed inset-0 pointer-events-none"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar-glass fixed w-full top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <h1 class="minecraft-font text-3xl font-bold gradient-text">PIKZELS NETWORK</h1>
+                    <div class="flex items-center space-x-2 text-sm">
+                        <span class="server-status"></span>
+                        <span class="text-green-400">Server Online</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <button onclick="showPage('home')" class="nav-link hover:text-green-400 transition-colors">Home</button>
+                    <button onclick="showPage('store')" class="nav-link hover:text-green-400 transition-colors">Store</button>
+                    <button onclick="showPage('stats')" class="nav-link hover:text-green-400 transition-colors">Stats</button>
+                    <button onclick="showPage('staff')" class="nav-link hover:text-green-400 transition-colors">Staff</button>
+                    <button onclick="showPage('contact')" class="nav-link hover:text-green-400 transition-colors">Contact</button>
+                    <button onclick="openLoginModal()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded transition-colors">Login</button>
+                </div>
+                <button class="md:hidden text-2xl" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="fixed inset-0 bg-black bg-opacity-90 z-40 hidden">
+        <div class="flex flex-col items-center justify-center h-full space-y-8 text-2xl">
+            <button onclick="showPage('home'); toggleMobileMenu()" class="hover:text-green-400 transition-colors">Home</button>
+            <button onclick="showPage('store'); toggleMobileMenu()" class="hover:text-green-400 transition-colors">Store</button>
+            <button onclick="showPage('stats'); toggleMobileMenu()" class="hover:text-green-400 transition-colors">Stats</button>
+            <button onclick="showPage('staff'); toggleMobileMenu()" class="hover:text-green-400 transition-colors">Staff</button>
+            <button onclick="showPage('contact'); toggleMobileMenu()" class="hover:text-green-400 transition-colors">Contact</button>
+            <button onclick="openLoginModal(); toggleMobileMenu()" class="bg-green-500 hover:bg-green-600 px-6 py-3 rounded transition-colors">Login</button>
+        </div>
+    </div>
+
+    <!-- Home Page -->
+    <div id="homePage" class="page-section active pt-20">
+        <!-- Hero Section -->
+        <section class="min-h-screen flex items-center justify-center relative overflow-hidden">
+            <div class="minecraft-bg absolute inset-0 opacity-10"></div>
+            <div class="container mx-auto px-6 text-center relative z-10">
+                <div class="floating">
+                    <h1 class="minecraft-font text-6xl md:text-8xl font-bold mb-6 gradient-text">PIKZELS NETWORK</h1>
+                    <p class="text-xl md:text-2xl mb-8 text-gray-300">The Ultimate Minecraft Experience Awaits</p>
+                    <div class="bg-gray-800 rounded-lg p-4 mb-8 inline-block">
+                        <p class="text-green-400 minecraft-font text-lg">sgp-free-4.sryzen.cloud:26602</p>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-4 justify-center items-center mb-12">
+                        <button onclick="copyServerIP()" class="glow-effect bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all">
+                            <i class="fas fa-copy mr-2"></i>Copy Server IP
+                        </button>
+                        <button onclick="showPage('store')" class="glow-effect bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all">
+                            <i class="fas fa-shopping-cart mr-2"></i>Visit Store
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Server Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                    <div class="stats-card rounded-lg p-6">
+                        <div class="text-3xl font-bold text-green-400 mb-2">247</div>
+                        <div class="text-gray-300">Players Online</div>
+                    </div>
+                    <div class="stats-card rounded-lg p-6">
+                        <div class="text-3xl font-bold text-blue-400 mb-2">5.2k</div>
+                        <div class="text-gray-300">Total Players</div>
+                    </div>
+                    <div class="stats-card rounded-lg p-6">
+                        <div class="text-3xl font-bold text-purple-400 mb-2">99.9%</div>
+                        <div class="text-gray-300">Uptime</div>
+                    </div>
+                    <div class="stats-card rounded-lg p-6">
+                        <div class="text-3xl font-bold text-yellow-400 mb-2">24/7</div>
+                        <div class="text-gray-300">Support</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="minecraft-font text-4xl font-bold text-center mb-16 gradient-text">Server Features</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="stats-card rounded-lg p-8 text-center">
+                        <div class="text-5xl mb-4"><i class="fas fa-gem text-green-400"></i></div>
+                        <h3 class="text-xl font-bold mb-4">Custom Crates</h3>
+                        <p class="text-gray-300">Unlock amazing rewards with our unique crate system</p>
+                    </div>
+                    <div class="stats-card rounded-lg p-8 text-center">
+                        <div class="text-5xl mb-4"><i class="fas fa-crown text-yellow-400"></i></div>
+                        <h3 class="text-xl font-bold mb-4">VIP Ranks</h3>
+                        <p class="text-gray-300">Exclusive perks and abilities for premium players</p>
+                    </div>
+                    <div class="stats-card rounded-lg p-8 text-center">
+                        <div class="text-5xl mb-4"><i class="fas fa-shield-alt text-blue-400"></i></div>
+                        <h3 class="text-xl font-bold mb-4">Anti-Grief</h3>
+                        <p class="text-gray-300">Advanced protection systems keep your builds safe</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Under Construction Notice -->
+        <section class="py-20 bg-yellow-900 bg-opacity-20">
+            <div class="container mx-auto px-6 text-center">
+                <div class="text-6xl mb-6"><i class="fas fa-hard-hat text-yellow-400"></i></div>
+                <h2 class="minecraft-font text-3xl font-bold mb-4 text-yellow-400">Server Under Construction</h2>
+                <p class="text-xl text-gray-300 mb-8">We're working hard to bring you the best Minecraft experience. Stay tuned for updates!</p>
+                <div class="bg-gray-800 rounded-lg p-6 inline-block">
+                    <p class="text-green-400">Expected Launch: Coming Soon</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Store Page -->
+    <div id="storePage" class="page-section pt-20">
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="minecraft-font text-4xl font-bold text-center mb-16 gradient-text">Server Store</h2>
+                
+                <!-- Crates Section -->
+                <div class="mb-16">
+                    <h3 class="minecraft-font text-2xl font-bold mb-8 text-center">Mystery Crates</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="crate-item rounded-lg p-6 text-center" onclick="buyCrate('common')">
+                            <div class="text-6xl mb-4"><i class="fas fa-box text-gray-400"></i></div>
+                            <h4 class="text-xl font-bold mb-2">Common Crate</h4>
+                            <p class="text-gray-300 mb-4">Basic items and resources</p>
+                            <div class="text-2xl font-bold text-green-400 mb-4">₹50</div>
+                            <button class="bg-green-500 hover:bg-green-600 w-full py-2 rounded transition-colors">Purchase</button>
+                        </div>
+                        <div class="crate-item rounded-lg p-6 text-center" onclick="buyCrate('rare')">
+                            <div class="text-6xl mb-4"><i class="fas fa-box text-blue-400"></i></div>
+                            <h4 class="text-xl font-bold mb-2">Rare Crate</h4>
+                            <p class="text-gray-300 mb-4">Valuable items and tools</p>
+                            <div class="text-2xl font-bold text-blue-400 mb-4">₹150</div>
+                            <button class="bg-blue-500 hover:bg-blue-600 w-full py-2 rounded transition-colors">Purchase</button>
+                        </div>
+                        <div class="crate-item rounded-lg p-6 text-center" onclick="buyCrate('legendary')">
+                            <div class="text-6xl mb-4"><i class="fas fa-box text-purple-400"></i></div>
+                            <h4 class="text-xl font-bold mb-2">Legendary Crate</h4>
+                            <p class="text-gray-300 mb-4">Exclusive legendary items</p>
+                            <div class="text-2xl font-bold text-purple-400 mb-4">₹500</div>
+                            <button class="bg-purple-500 hover:bg-purple-600 w-full py-2 rounded transition-colors">Purchase</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIP Ranks Section -->
+                <div class="mb-16">
+                    <h3 class="minecraft-font text-2xl font-bold mb-8 text-center">VIP Ranks</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="crate-item rounded-lg p-8" onclick="buyRank('vip')">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-star text-yellow-400 text-3xl mr-4"></i>
+                                <h4 class="text-2xl font-bold">VIP Rank</h4>
+                            </div>
+                            <ul class="text-gray-300 mb-6 space-y-2">
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>Access to VIP areas</li>
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>Special chat colors</li>
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>Priority support</li>
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>Monthly crate keys</li>
+                            </ul>
+                            <div class="text-3xl font-bold text-yellow-400 mb-4">₹999</div>
+                            <button class="bg-yellow-500 hover:bg-yellow-600 w-full py-3 rounded transition-colors font-bold">Purchase VIP</button>
+                        </div>
+                        <div class="crate-item rounded-lg p-8" onclick="buyRank('mvp')">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-crown text-purple-400 text-3xl mr-4"></i>
+                                <h4 class="text-2xl font-bold">MVP Rank</h4>
+                            </div>
+                            <ul class="text-gray-300 mb-6 space-y-2">
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>All VIP benefits</li>
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>Exclusive MVP areas</li>
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>Custom commands</li>
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>Weekly rare crates</li>
+                                <li><i class="fas fa-check text-green-400 mr-2"></i>Flying permissions</li>
+                            </ul>
+                            <div class="text-3xl font-bold text-purple-400 mb-4">₹1,999</div>
+                            <button class="bg-purple-500 hover:bg-purple-600 w-full py-3 rounded transition-colors font-bold">Purchase MVP</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Stats Page -->
+    <div id="statsPage" class="page-section pt-20">
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="minecraft-font text-4xl font-bold text-center mb-16 gradient-text">Server Statistics</h2>
+                
+                <!-- Live Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                    <div class="stats-card rounded-lg p-6 text-center">
+                        <div class="text-4xl font-bold text-green-400 mb-2" id="playersOnline">247</div>
+                        <div class="text-gray-300">Players Online</div>
+                        <div class="text-sm text-green-400 mt-2">🟢 Live</div>
+                    </div>
+                    <div class="stats-card rounded-lg p-6 text-center">
+                        <div class="text-4xl font-bold text-blue-400 mb-2">5,247</div>
+                        <div class="text-gray-300">Total Registered</div>
+                        <div class="text-sm text-blue-400 mt-2">📈 Growing</div>
+                    </div>
+                    <div class="stats-card rounded-lg p-6 text-center">
+                        <div class="text-4xl font-bold text-purple-400 mb-2">1,389</div>
+                        <div class="text-gray-300">Crates Opened</div>
+                        <div class="text-sm text-purple-400 mt-2">📦 Today</div>
+                    </div>
+                    <div class="stats-card rounded-lg p-6 text-center">
+                        <div class="text-4xl font-bold text-yellow-400 mb-2">99.9%</div>
+                        <div class="text-gray-300">Server Uptime</div>
+                        <div class="text-sm text-yellow-400 mt-2">⚡ Reliable</div>
+                    </div>
+                </div>
+
+                <!-- Player Activity Chart -->
+                <div class="stats-card rounded-lg p-8 mb-16">
+                    <h3 class="text-2xl font-bold mb-6 text-center">Player Activity (Last 7 Days)</h3>
+                    <div style="height: 400px;">
+                        <canvas id="playerChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Players -->
+                <div class="stats-card rounded-lg p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-center">Top Players This Month</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                            <div class="flex items-center space-x-4">
+                                <div class="text-2xl">🥇</div>
+                                <div>
+                                    <div class="font-bold">OG_KRISH2011</div>
+                                    <div class="text-sm text-gray-400">Owner</div>
+                                </div>
+                            </div>
+                            <div class="text-green-400 font-bold">500 hrs</div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                            <div class="flex items-center space-x-4">
+                                <div class="text-2xl">🥈</div>
+                                <div>
+                                    <div class="font-bold">Oggy4iluX</div>
+                                    <div class="text-sm text-gray-400">Admin</div>
+                                </div>
+                            </div>
+                            <div class="text-blue-400 font-bold">450 hrs</div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg">
+                            <div class="flex items-center space-x-4">
+                                <div class="text-2xl">🥉</div>
+                                <div>
+                                    <div class="font-bold">MinecraftPro2024</div>
+                                    <div class="text-sm text-gray-400">Player</div>
+                                </div>
+                            </div>
+                            <div class="text-purple-400 font-bold">420 hrs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Staff Page -->
+    <div id="staffPage" class="page-section pt-20">
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="minecraft-font text-4xl font-bold text-center mb-16 gradient-text">Our Staff Team</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Owner -->
+                    <div class="stats-card rounded-lg p-8 text-center">
+                        <div class="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <i class="fas fa-crown text-3xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">OG_KRISH2011</h3>
+                        <div class="text-yellow-400 font-bold mb-4">OWNER & DEVELOPER</div>
+                        <p class="text-gray-300 mb-4">Founder and lead developer of PIKZELS NETWORK. Passionate about creating the best Minecraft experience.</p>
+                        <div class="flex justify-center space-x-4">
+                            <div class="text-green-400"><i class="fas fa-circle"></i> Online</div>
+                        </div>
+                    </div>
+
+                    <!-- Admin -->
+                    <div class="stats-card rounded-lg p-8 text-center">
+                        <div class="w-24 h-24 bg-gradient-to-br from-red-500 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-3xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Oggy4iluX</h3>
+                        <div class="text-red-400 font-bold mb-4">ADMIN</div>
+                        <p class="text-gray-300 mb-4">Server administrator ensuring smooth gameplay and helping players with their needs.</p>
+                        <div class="flex justify-center space-x-4">
+                            <div class="text-green-400"><i class="fas fa-circle"></i> Online</div>
+                        </div>
+                    </div>
+
+                    <!-- Moderator Position -->
+                    <div class="stats-card rounded-lg p-8 text-center opacity-75">
+                        <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <i class="fas fa-user-plus text-3xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Position Open</h3>
+                        <div class="text-blue-400 font-bold mb-4">MODERATOR</div>
+                        <p class="text-gray-300 mb-4">We're looking for dedicated players to join our moderation team. Applications coming soon!</p>
+                        <button class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded transition-colors">Apply Soon</button>
+                    </div>
+                </div>
+
+                <!-- Staff Applications -->
+                <div class="mt-16 text-center">
+                    <div class="stats-card rounded-lg p-8 max-w-2xl mx-auto">
+                        <h3 class="text-2xl font-bold mb-4">Join Our Team</h3>
+                        <p class="text-gray-300 mb-6">Interested in becoming part of the PIKZELS NETWORK staff team? We're always looking for dedicated and helpful community members.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                            <div class="p-4">
+                                <div class="text-3xl mb-2">📋</div>
+                                <h4 class="font-bold mb-2">Requirements</h4>
+                                <p class="text-sm text-gray-400">Active player, helpful attitude, Discord required</p>
+                            </div>
+                            <div class="p-4">
+                                <div class="text-3xl mb-2">⏰</div>
+                                <h4 class="font-bold mb-2">Commitment</h4>
+                                <p class="text-sm text-gray-400">Minimum 10 hours per week availability</p>
+                            </div>
+                            <div class="p-4">
+                                <div class="text-3xl mb-2">🎯</div>
+                                <h4 class="font-bold mb-2">Benefits</h4>
+                                <p class="text-sm text-gray-400">Staff perks, recognition, community impact</p>
+                            </div>
+                        </div>
+                        <button onclick="showPage('contact')" class="bg-green-500 hover:bg-green-600 mt-6 px-6 py-3 rounded transition-colors">Contact Us</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Contact Page -->
+    <div id="contactPage" class="page-section pt-20">
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="minecraft-font text-4xl font-bold text-center mb-16 gradient-text">Contact Us</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- Contact Form -->
+                    <div class="stats-card rounded-lg p-8">
+                        <h3 class="text-2xl font-bold mb-6">Send us a Message</h3>
+                        <form id="contactForm" class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Your Name</label>
+                                <input type="text" id="contactName" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Email Address</label>
+                                <input type="email" id="contactEmail" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Minecraft Username</label>
+                                <input type="text" id="contactUsername" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Subject</label>
+                                <select id="contactSubject" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" required>
+                                    <option value="">Select a subject</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="support">Technical Support</option>
+                                    <option value="report">Report Player/Bug</option>
+                                    <option value="staff">Staff Application</option>
+                                    <option value="partnership">Partnership</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-2">Message</label>
+                                <textarea id="contactMessage" rows="6" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" required></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-green-500 hover:bg-green-600 py-3 rounded font-bold transition-colors">
+                                <i class="fas fa-paper-plane mr-2"></i>Send Message
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="space-y-8">
+                        <div class="stats-card rounded-lg p-8">
+                            <h3 class="text-2xl font-bold mb-6">Get in Touch</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-2xl text-green-400"><i class="fas fa-envelope"></i></div>
+                                    <div>
+                                        <div class="font-bold">Email</div>
+                                        <div class="text-gray-300">archukrish2008@gmail.com</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-2xl text-blue-400"><i class="fab fa-discord"></i></div>
+                                    <div>
+                                        <div class="font-bold">Discord</div>
+                                        <div class="text-gray-300">Coming Soon</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-2xl text-green-400"><i class="fas fa-server"></i></div>
+                                    <div>
+                                        <div class="font-bold">Server IP</div>
+                                        <div class="text-gray-300">sgp-free-4.sryzen.cloud:26602</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <div class="text-2xl text-yellow-400"><i class="fas fa-clock"></i></div>
+                                    <div>
+                                        <div class="font-bold">Response Time</div>
+                                        <div class="text-gray-300">Usually within 24 hours</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stats-card rounded-lg p-8">
+                            <h3 class="text-2xl font-bold mb-6">Quick Support</h3>
+                            <div class="space-y-4">
+                                <div class="p-4 bg-gray-800 rounded-lg">
+                                    <div class="font-bold mb-2">Technical Issues</div>
+                                    <div class="text-sm text-gray-400">Can't connect? Having lag issues? Contact us for immediate assistance.</div>
+                                </div>
+                                <div class="p-4 bg-gray-800 rounded-lg">
+                                    <div class="font-bold mb-2">Account Problems</div>
+                                    <div class="text-sm text-gray-400">Issues with ranks, purchases, or account access? We're here to help.</div>
+                                </div>
+                                <div class="p-4 bg-gray-800 rounded-lg">
+                                    <div class="font-bold mb-2">Report Players</div>
+                                    <div class="text-sm text-gray-400">Encountered rule breakers? Report them with evidence for quick action.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Login to PIKZELS NETWORK</h3>
+                <button onclick="closeLoginModal()" class="text-2xl">&times;</button>
+            </div>
+            
+            <div id="loginStep1">
+                <div class="space-y-4 mb-6">
+                    <button onclick="loginWithGoogle()" class="w-full bg-red-500 hover:bg-red-600 p-3 rounded flex items-center justify-center transition-colors">
+                        <i class="fab fa-google mr-2"></i>Continue with Google
+                    </button>
+                    <button onclick="loginWithMicrosoft()" class="w-full bg-blue-500 hover:bg-blue-600 p-3 rounded flex items-center justify-center transition-colors">
+                        <i class="fab fa-microsoft mr-2"></i>Continue with Microsoft
+                    </button>
+                </div>
+                
+                <div class="text-center mb-4 text-gray-400">or</div>
+                
+                <div class="space-y-4">
+                    <input type="email" id="loginEmail" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" placeholder="Enter your email">
+                    <button onclick="sendEmailCode()" class="w-full bg-green-500 hover:bg-green-600 p-3 rounded transition-colors">
+                        <i class="fas fa-envelope mr-2"></i>Send Verification Code
+                    </button>
+                </div>
+            </div>
+            
+            <div id="loginStep2" style="display: none;">
+                <div class="text-center mb-6">
+                    <p class="text-gray-300">We've sent a verification code to your email</p>
+                </div>
+                <div class="space-y-4">
+                    <input type="text" id="verificationCode" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none text-center text-2xl" placeholder="Enter 6-digit code" maxlength="6">
+                    <button onclick="verifyCode()" class="w-full bg-green-500 hover:bg-green-600 p-3 rounded transition-colors">Verify & Login</button>
+                    <button onclick="backToStep1()" class="w-full bg-gray-600 hover:bg-gray-700 p-3 rounded transition-colors">Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Complete Purchase</h3>
+                <button onclick="closePaymentModal()" class="text-2xl">&times;</button>
+            </div>
+            
+            <div id="paymentDetails" class="mb-6 p-4 bg-gray-800 rounded-lg">
+                <div class="flex justify-between items-center">
+                    <span>Item:</span>
+                    <span id="paymentItem" class="font-bold"></span>
+                </div>
+                <div class="flex justify-between items-center mt-2">
+                    <span>Price:</span>
+                    <span id="paymentPrice" class="font-bold text-green-400"></span>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-4">Select Payment Method</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="payment-method p-4 rounded-lg" onclick="selectPaymentMethod('upi')">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-mobile-alt text-2xl text-green-400"></i>
+                            <div>
+                                <div class="font-bold">UPI Payment</div>
+                                <div class="text-sm text-gray-400">PhonePe, GPay, Paytm</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="payment-method p-4 rounded-lg" onclick="selectPaymentMethod('card')">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-credit-card text-2xl text-blue-400"></i>
+                            <div>
+                                <div class="font-bold">Debit/Credit Card</div>
+                                <div class="text-sm text-gray-400">Visa, MasterCard</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="upiPayment" style="display: none;">
+                <div class="space-y-4">
+                    <input type="text" id="upiId" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" placeholder="Enter UPI ID">
+                    <button onclick="processUPIPayment()" class="w-full bg-green-500 hover:bg-green-600 p-3 rounded transition-colors">Pay with UPI</button>
+                </div>
+            </div>
+            
+            <div id="cardPayment" style="display: none;">
+                <div class="space-y-4">
+                    <input type="text" id="cardNumber" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" placeholder="Card Number" maxlength="19">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" id="cardExpiry" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" placeholder="MM/YY" maxlength="5">
+                        <input type="text" id="cardCVV" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" placeholder="CVV" maxlength="3">
+                    </div>
+                    <input type="text" id="cardName" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" placeholder="Cardholder Name">
+                    <button onclick="processCardPayment()" class="w-full bg-blue-500 hover:bg-blue-600 p-3 rounded transition-colors">Pay with Card</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Global Variables
+        let currentPage = 'home';
+        let isLoggedIn = false;
+        let currentUser = null;
+        let paymentInProgress = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWebsite();
+        });
+
+        function initializeWebsite() {
+            // Simulate loading
+            let progress = 0;
+            const loadingBar = document.getElementById('loadingBar');
+            const loadingScreen = document.getElementById('loadingScreen');
+            
+            const loadingInterval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(loadingInterval);
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                        createParticles();
+                        initializeStats();
+                        startRealTimeUpdates();
+                    }, 500);
+                }
+                loadingBar.style.width = progress + '%';
+            }, 200);
+        }
+
+        // Particle System
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (3 + Math.random() * 3) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Navigation
+        function showPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId + 'Page').classList.add('active');
+            currentPage = pageId;
+            
+            // Update navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('text-green-400');
+            });
+            
+            if (pageId === 'stats') {
+                initializeChart();
+            }
+        }
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Authentication System
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('loginStep1').style.display = 'block';
+            document.getElementById('loginStep2').style.display = 'none';
+        }
+
+        function loginWithGoogle() {
+            showNotification('Google login integration coming soon!', 'success');
+            // Simulate successful login
+            setTimeout(() => {
+                simulateLogin('Google User', 'google');
+            }, 1000);
+        }
+
+        function loginWithMicrosoft() {
+            showNotification('Microsoft login integration coming soon!', 'success');
+            // Simulate successful login
+            setTimeout(() => {
+                simulateLogin('Microsoft User', 'microsoft');
+            }, 1000);
+        }
+
+        function sendEmailCode() {
+            const email = document.getElementById('loginEmail').value;
+            if (!email || !isValidEmail(email)) {
+                showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+            
+            // Generate random 6-digit code
+            const code = Math.floor(100000 + Math.random() * 900000);
+            localStorage.setItem('verificationCode', code.toString());
+            localStorage.setItem('userEmail', email);
+            
+            // Simulate sending email
+            showNotification('Verification code sent to your email!', 'success');
+            document.getElementById('loginStep1').style.display = 'none';
+            document.getElementById('loginStep2').style.display = 'block';
+        }
+
+        function verifyCode() {
+            const enteredCode = document.getElementById('verificationCode').value;
+            const storedCode = localStorage.getItem('verificationCode');
+            
+            if (enteredCode === storedCode) {
+                const email = localStorage.getItem('userEmail');
+                simulateLogin(email, 'email');
+                showNotification('Login successful!', 'success');
+                closeLoginModal();
+            } else {
+                showNotification('Invalid verification code', 'error');
+            }
+        }
+
+        function backToStep1() {
+            document.getElementById('loginStep1').style.display = 'block';
+            document.getElementById('loginStep2').style.display = 'none';
+        }
+
+        function simulateLogin(username, method) {
+            isLoggedIn = true;
+            currentUser = { username, method };
+            updateNavigation();
+        }
+
+        function updateNavigation() {
+            // Update login button to user menu
+            // This would be implemented in a real application
+        }
+
+        // Payment System
+        function buyCrate(type) {
+            if (!isLoggedIn) {
+                showNotification('Please login first to make purchases', 'error');
+                openLoginModal();
+                return;
+            }
+            
+            const prices = {
+                'common': '₹50',
+                'rare': '₹150',
+                'legendary': '₹500'
+            };
+            
+            const names = {
+                'common': 'Common Crate',
+                'rare': 'Rare Crate',
+                'legendary': 'Legendary Crate'
+            };
+            
+            openPaymentModal(names[type], prices[type]);
+        }
+
+        function buyRank(type) {
+            if (!isLoggedIn) {
+                showNotification('Please login first to make purchases', 'error');
+                openLoginModal();
+                return;
+            }
+            
+            const prices = {
+                'vip': '₹999',
+                'mvp': '₹1,999'
+            };
+            
+            const names = {
+                'vip': 'VIP Rank',
+                'mvp': 'MVP Rank'
+            };
+            
+            openPaymentModal(names[type], prices[type]);
+        }
+
+        function openPaymentModal(item, price) {
+            document.getElementById('paymentItem').textContent = item;
+            document.getElementById('paymentPrice').textContent = price;
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            // Reset payment method selection
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.classList.remove('selected');
+            });
+            document.getElementById('upiPayment').style.display = 'none';
+            document.getElementById('cardPayment').style.display = 'none';
+        }
+
+        function selectPaymentMethod(method) {
+            document.querySelectorAll('.payment-method').forEach(m => {
+                m.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            document.getElementById('upiPayment').style.display = method === 'upi' ? 'block' : 'none';
+            document.getElementById('cardPayment').style.display = method === 'card' ? 'block' : 'none';
+        }
+
+        function processUPIPayment() {
+            const upiId = document.getElementById('upiId').value;
+            if (!upiId || !isValidUPI(upiId)) {
+                showNotification('Please enter a valid UPI ID', 'error');
+                return;
+            }
+            
+            // Simulate payment processing
+            paymentInProgress = true;
+            showNotification('Processing UPI payment...', 'success');
+            
+            setTimeout(() => {
+                paymentInProgress = false;
+                showNotification('Payment successful! Items will be delivered in-game.', 'success');
+                closePaymentModal();
+            }, 3000);
+        }
+
+        function processCardPayment() {
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const cardExpiry = document.getElementById('cardExpiry').value;
+            const cardCVV = document.getElementById('cardCVV').value;
+            const cardName = document.getElementById('cardName').value;
+            
+            if (!validateCard(cardNumber, cardExpiry, cardCVV, cardName)) {
+                return;
+            }
+            
+            // Simulate payment processing
+            paymentInProgress = true;
+            showNotification('Processing card payment...', 'success');
+            
+            setTimeout(() => {
+                paymentInProgress = false;
+                showNotification('Payment successful! Items will be delivered in-game.', 'success');
+                closePaymentModal();
+            }, 3000);
+        }
+
+        // Validation Functions
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function isValidUPI(upi) {
+            return /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(upi);
+        }
+
+        function validateCard(number, expiry, cvv, name) {
+            if (!number || number.length < 13 || number.length > 19) {
+                showNotification('Please enter a valid card number', 'error');
+                return false;
+            }
+            
+            if (!expiry || !/^\d{2}\/\d{2}$/.test(expiry)) {
+                showNotification('Please enter a valid expiry date (MM/YY)', 'error');
+                return false;
+            }
+            
+            if (!cvv || cvv.length < 3 || cvv.length > 4) {
+                showNotification('Please enter a valid CVV', 'error');
+                return false;
+            }
+            
+            if (!name || name.length < 2) {
+                showNotification('Please enter the cardholder name', 'error');
+                return false;
+            }
+            
+            // Basic Luhn algorithm check
+            if (!luhnCheck(number)) {
+                showNotification('Invalid card number', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function luhnCheck(cardNumber) {
+            let sum = 0;
+            let alternate = false;
+            
+            for (let i = cardNumber.length - 1; i >= 0; i--) {
+                let n = parseInt(cardNumber.charAt(i), 10);
+                
+                if (alternate) {
+                    n *= 2;
+                    if (n > 9) {
+                        n = (n % 10) + 1;
+                    }
+                }
+                
+                sum += n;
+                alternate = !alternate;
+            }
+            
+            return (sum % 10) === 0;
+        }
+
+        // Contact Form
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('contactName').value,
+                email: document.getElementById('contactEmail').value,
+                username: document.getElementById('contactUsername').value,
+                subject: document.getElementById('contactSubject').value,
+                message: document.getElementById('contactMessage').value
+            };
+            
+            // Simulate sending email
+            showNotification('Message sent successfully! We will respond within 24 hours.', 'success');
+            
+            // Reset form
+            document.getElementById('contactForm').reset();
+        });
+
+        // Utility Functions
+        function copyServerIP() {
+            const serverIP = 'sgp-free-4.sryzen.cloud:26602';
+            navigator.clipboard.writeText(serverIP).then(() => {
+                showNotification('Server IP copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy IP. Please copy manually: ' + serverIP, 'error');
+            });
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Real-time Updates
+        function startRealTimeUpdates() {
+            // Update player count every 30 seconds
+            setInterval(updatePlayerCount, 30000);
+            
+            // Update other stats every 5 minutes
+            setInterval(updateStats, 300000);
+        }
+
+        function updatePlayerCount() {
+            const baseCount = 247;
+            const variation = Math.floor(Math.random() * 20) - 10;
+            const newCount = Math.max(0, baseCount + variation);
+            
+            const playerCountElements = document.querySelectorAll('#playersOnline');
+            playerCountElements.forEach(el => {
+                el.textContent = newCount;
+            });
+        }
+
+        function updateStats() {
+            // Simulate real-time stat updates
+            updatePlayerCount();
+        }
+
+        // Chart Initialization
+        function initializeChart() {
+            const ctx = document.getElementById('playerChart');
+            if (!ctx || ctx.chart) return;
+            
+            ctx.chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Players Online',
+                        data: [180, 220, 195, 280, 310, 350, 290],
+                        borderColor: '#4ade80',
+                        backgroundColor: 'rgba(74, 222, 128, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeStats() {
+            // Initialize any additional stats or animations
+        }
+
+        // Card number formatting
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+
+        // Expiry date formatting
+        document.getElementById('cardExpiry').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // CVV formatting
+        document.getElementById('cardCVV').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+    </script>
+</body>
+</html>
