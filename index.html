@@ -187,6 +187,10 @@
             background: linear-gradient(135deg, #dc2626, #f87171);
         }
 
+        .notification.warning {
+            background: linear-gradient(135deg, #d97706, #fbbf24);
+        }
+
         .page-section {
             display: none;
         }
@@ -216,6 +220,113 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
+        .verification-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .verification-status.verified {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .verification-status.unverified {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .verification-status.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80, #22d3ee);
+            transition: width 0.3s ease;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border: 2px solid #4a5568;
+            border-radius: 8px;
+            background: #2d3748;
+            color: white;
+            margin: 0 4px;
+        }
+
+        .otp-input:focus {
+            border-color: #4ade80;
+            outline: none;
+        }
+
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: 8px;
+            padding: 8px 0;
+            min-width: 200px;
+            z-index: 1000;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-dropdown-item {
+            display: block;
+            padding: 8px 16px;
+            color: white;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .user-dropdown-item:hover {
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .email-verification-banner {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            display: none;
+        }
+
+        .email-verification-banner.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -226,6 +337,15 @@
         <div class="mt-4 w-64 bg-gray-700 rounded-full h-2">
             <div class="bg-green-400 h-2 rounded-full" style="width: 0%" id="loadingBar"></div>
         </div>
+    </div>
+
+    <!-- Email Verification Banner -->
+    <div id="emailVerificationBanner" class="email-verification-banner">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        Please verify your email address to access all features. 
+        <button onclick="resendVerificationEmail()" class="ml-4 bg-white bg-opacity-20 px-3 py-1 rounded text-sm hover:bg-opacity-30 transition-colors">
+            Resend Email
+        </button>
     </div>
 
     <!-- Particles -->
@@ -248,7 +368,35 @@
                     <button onclick="showPage('stats')" class="nav-link hover:text-green-400 transition-colors">Stats</button>
                     <button onclick="showPage('staff')" class="nav-link hover:text-green-400 transition-colors">Staff</button>
                     <button onclick="showPage('contact')" class="nav-link hover:text-green-400 transition-colors">Contact</button>
-                    <button onclick="openLoginModal()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded transition-colors">Login</button>
+                    
+                    <!-- User Menu (shown when logged in) -->
+                    <div id="userMenu" class="user-menu" style="display: none;">
+                        <button onclick="toggleUserMenu()" class="flex items-center space-x-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded transition-colors">
+                            <i class="fas fa-user"></i>
+                            <span id="username">User</span>
+                            <span id="verificationStatus" class="verification-status unverified">
+                                <i class="fas fa-times mr-1"></i>Unverified
+                            </span>
+                        </button>
+                        <div id="userDropdown" class="user-dropdown">
+                            <a href="#" class="user-dropdown-item" onclick="showPage('profile')">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="#" class="user-dropdown-item" onclick="verifyEmailAction()">
+                                <i class="fas fa-envelope mr-2"></i>Verify Email
+                            </a>
+                            <a href="#" class="user-dropdown-item" onclick="showPage('purchases')">
+                                <i class="fas fa-shopping-bag mr-2"></i>My Purchases
+                            </a>
+                            <div class="border-t border-gray-600 my-2"></div>
+                            <a href="#" class="user-dropdown-item" onclick="logout()">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Login Button (shown when not logged in) -->
+                    <button id="loginButton" onclick="openLoginModal()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded transition-colors">Login</button>
                 </div>
                 <button class="md:hidden text-2xl" onclick="toggleMobileMenu()">
                     <i class="fas fa-bars"></i>
@@ -683,7 +831,7 @@
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold">Login to PIKZELS NETWORK</h3>
+                <h3 class="text-2xl font-bold">Join PIKZELS NETWORK</h3>
                 <button onclick="closeLoginModal()" class="text-2xl">&times;</button>
             </div>
             
@@ -697,24 +845,125 @@
                     </button>
                 </div>
                 
-                <div class="text-center mb-4 text-gray-400">or</div>
+                <div class="text-center mb-4 text-gray-400">or create account with email</div>
                 
                 <div class="space-y-4">
+                    <input type="text" id="loginUsername" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" placeholder="Choose a username">
                     <input type="email" id="loginEmail" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" placeholder="Enter your email">
                     <button onclick="sendEmailCode()" class="w-full bg-green-500 hover:bg-green-600 p-3 rounded transition-colors">
                         <i class="fas fa-envelope mr-2"></i>Send Verification Code
                     </button>
                 </div>
+                
+                <div class="mt-4 text-sm text-gray-400 text-center">
+                    By continuing, you agree to our Terms of Service and Privacy Policy
+                </div>
             </div>
             
             <div id="loginStep2" style="display: none;">
                 <div class="text-center mb-6">
-                    <p class="text-gray-300">We've sent a verification code to your email</p>
+                    <div class="text-4xl mb-4"><i class="fas fa-envelope text-green-400"></i></div>
+                    <h4 class="text-xl font-bold mb-2">Check Your Email</h4>
+                    <p class="text-gray-300">We've sent a 6-digit verification code to</p>
+                    <p class="text-green-400 font-bold" id="verificationEmailDisplay"></p>
                 </div>
-                <div class="space-y-4">
-                    <input type="text" id="verificationCode" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none text-center text-2xl" placeholder="Enter 6-digit code" maxlength="6">
-                    <button onclick="verifyCode()" class="w-full bg-green-500 hover:bg-green-600 p-3 rounded transition-colors">Verify & Login</button>
-                    <button onclick="backToStep1()" class="w-full bg-gray-600 hover:bg-gray-700 p-3 rounded transition-colors">Back</button>
+                
+                <div class="space-y-6">
+                    <div class="flex justify-center space-x-2">
+                        <input type="text" class="otp-input" maxlength="1" id="otp1">
+                        <input type="text" class="otp-input" maxlength="1" id="otp2">
+                        <input type="text" class="otp-input" maxlength="1" id="otp3">
+                        <input type="text" class="otp-input" maxlength="1" id="otp4">
+                        <input type="text" class="otp-input" maxlength="1" id="otp5">
+                        <input type="text" class="otp-input" maxlength="1" id="otp6">
+                    </div>
+                    
+                    <button onclick="verifyCode()" class="w-full bg-green-500 hover:bg-green-600 p-3 rounded transition-colors">
+                        <i class="fas fa-check mr-2"></i>Verify & Create Account
+                    </button>
+                    
+                    <div class="text-center space-y-2">
+                        <button onclick="resendCode()" class="text-green-400 hover:text-green-300 text-sm">
+                            Didn't receive the code? Resend
+                        </button>
+                        <br>
+                        <button onclick="backToStep1()" class="text-gray-400 hover:text-gray-300 text-sm">
+                            Change email address
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="resendTimer" class="text-center text-sm text-gray-400 mt-4" style="display: none;">
+                    Resend available in <span id="timerCount">60</span> seconds
+                </div>
+            </div>
+            
+            <div id="loginStep3" style="display: none;">
+                <div class="text-center mb-6">
+                    <div class="text-4xl mb-4"><i class="fas fa-check-circle text-green-400"></i></div>
+                    <h4 class="text-xl font-bold mb-2">Welcome to PIKZELS NETWORK!</h4>
+                    <p class="text-gray-300">Your account has been created successfully</p>
+                </div>
+                
+                <div class="bg-gray-800 rounded-lg p-4 mb-6">
+                    <div class="flex items-center justify-between">
+                        <span>Username:</span>
+                        <span class="font-bold text-green-400" id="welcomeUsername"></span>
+                    </div>
+                    <div class="flex items-center justify-between mt-2">
+                        <span>Email:</span>
+                        <span class="font-bold" id="welcomeEmail"></span>
+                    </div>
+                    <div class="flex items-center justify-between mt-2">
+                        <span>Status:</span>
+                        <span class="verification-status verified">
+                            <i class="fas fa-check mr-1"></i>Verified
+                        </span>
+                    </div>
+                </div>
+                
+                <button onclick="completeLogin()" class="w-full bg-green-500 hover:bg-green-600 p-3 rounded transition-colors">
+                    <i class="fas fa-gamepad mr-2"></i>Start Playing
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Verification Modal -->
+    <div id="emailVerificationModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Verify Your Email</h3>
+                <button onclick="closeEmailVerificationModal()" class="text-2xl">&times;</button>
+            </div>
+            
+            <div class="text-center mb-6">
+                <div class="text-4xl mb-4"><i class="fas fa-envelope-open text-yellow-400"></i></div>
+                <p class="text-gray-300 mb-2">Email verification is required to access all features</p>
+                <p class="text-sm text-gray-400">Current email: <span id="currentEmailDisplay" class="text-white font-bold"></span></p>
+            </div>
+            
+            <div class="space-y-4">
+                <button onclick="sendVerificationEmail()" class="w-full bg-green-500 hover:bg-green-600 p-3 rounded transition-colors">
+                    <i class="fas fa-paper-plane mr-2"></i>Send Verification Email
+                </button>
+                <button onclick="changeEmail()" class="w-full bg-gray-600 hover:bg-gray-700 p-3 rounded transition-colors">
+                    <i class="fas fa-edit mr-2"></i>Change Email Address
+                </button>
+            </div>
+            
+            <div class="mt-6 p-4 bg-yellow-900 bg-opacity-30 rounded-lg">
+                <div class="flex items-start space-x-3">
+                    <i class="fas fa-info-circle text-yellow-400 mt-1"></i>
+                    <div class="text-sm">
+                        <p class="font-bold text-yellow-400 mb-1">Why verify your email?</p>
+                        <ul class="text-gray-300 space-y-1">
+                            <li>• Make purchases in our store</li>
+                            <li>• Receive important server updates</li>
+                            <li>• Reset your password if needed</li>
+                            <li>• Join VIP events and giveaways</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -765,7 +1014,7 @@
             
             <div id="upiPayment" style="display: none;">
                 <div class="space-y-4">
-                    <input type="text" id="upiId" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" placeholder="Enter UPI ID">
+                    <input type="text" id="upiId" class="w-full p-3 bg-gray-800 border border-gray-600 rounded focus:border-green-400 focus:outline-none" placeholder="Enter UPI ID (e.g., yourname@paytm)">
                     <button onclick="processUPIPayment()" class="w-full bg-green-500 hover:bg-green-600 p-3 rounded transition-colors">Pay with UPI</button>
                 </div>
             </div>
@@ -793,10 +1042,14 @@
         let isLoggedIn = false;
         let currentUser = null;
         let paymentInProgress = false;
+        let resendTimer = null;
+        let resendTimeLeft = 0;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             initializeWebsite();
+            setupOTPInputs();
+            checkLoginStatus();
         });
 
         function initializeWebsite() {
@@ -821,6 +1074,40 @@
             }, 200);
         }
 
+        // Check login status on page load
+        function checkLoginStatus() {
+            const userData = localStorage.getItem('pikzelsUser');
+            if (userData) {
+                const user = JSON.parse(userData);
+                currentUser = user;
+                isLoggedIn = true;
+                updateNavigation();
+                
+                // Check email verification status
+                if (!user.emailVerified) {
+                    showEmailVerificationBanner();
+                }
+            }
+        }
+
+        // Setup OTP inputs
+        function setupOTPInputs() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            otpInputs.forEach((input, index) => {
+                input.addEventListener('input', function(e) {
+                    if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                });
+            });
+        }
+
         // Particle System
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
@@ -842,11 +1129,6 @@
             document.getElementById(pageId + 'Page').classList.add('active');
             currentPage = pageId;
             
-            // Update navigation
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('text-green-400');
-            });
-            
             if (pageId === 'stats') {
                 initializeChart();
             }
@@ -857,6 +1139,40 @@
             mobileMenu.classList.toggle('hidden');
         }
 
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+            
+            // Close when clicking outside
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!e.target.closest('.user-menu')) {
+                    dropdown.classList.remove('show');
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }
+
+        function updateNavigation() {
+            if (isLoggedIn && currentUser) {
+                document.getElementById('loginButton').style.display = 'none';
+                document.getElementById('userMenu').style.display = 'block';
+                document.getElementById('username').textContent = currentUser.username;
+                
+                // Update verification status
+                const statusElement = document.getElementById('verificationStatus');
+                if (currentUser.emailVerified) {
+                    statusElement.className = 'verification-status verified';
+                    statusElement.innerHTML = '<i class="fas fa-check mr-1"></i>Verified';
+                } else {
+                    statusElement.className = 'verification-status unverified';
+                    statusElement.innerHTML = '<i class="fas fa-times mr-1"></i>Unverified';
+                }
+            } else {
+                document.getElementById('loginButton').style.display = 'block';
+                document.getElementById('userMenu').style.display = 'none';
+            }
+        }
+
         // Authentication System
         function openLoginModal() {
             document.getElementById('loginModal').style.display = 'flex';
@@ -864,15 +1180,31 @@
 
         function closeLoginModal() {
             document.getElementById('loginModal').style.display = 'none';
+            resetLoginModal();
+        }
+
+        function resetLoginModal() {
             document.getElementById('loginStep1').style.display = 'block';
             document.getElementById('loginStep2').style.display = 'none';
+            document.getElementById('loginStep3').style.display = 'none';
+            
+            // Clear inputs
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginEmail').value = '';
+            document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+            
+            // Clear timer
+            if (resendTimer) {
+                clearInterval(resendTimer);
+                resendTimer = null;
+            }
         }
 
         function loginWithGoogle() {
             showNotification('Google login integration coming soon!', 'success');
             // Simulate successful login
             setTimeout(() => {
-                simulateLogin('Google User', 'google');
+                simulateLogin('GoogleUser' + Math.floor(Math.random() * 1000), 'google.user@gmail.com', 'google', true);
             }, 1000);
         }
 
@@ -880,56 +1212,289 @@
             showNotification('Microsoft login integration coming soon!', 'success');
             // Simulate successful login
             setTimeout(() => {
-                simulateLogin('Microsoft User', 'microsoft');
+                simulateLogin('MSUser' + Math.floor(Math.random() * 1000), 'microsoft.user@outlook.com', 'microsoft', true);
             }, 1000);
         }
 
         function sendEmailCode() {
-            const email = document.getElementById('loginEmail').value;
+            const username = document.getElementById('loginUsername').value.trim();
+            const email = document.getElementById('loginEmail').value.trim();
+            
+            if (!username) {
+                showNotification('Please enter a username', 'error');
+                return;
+            }
+            
             if (!email || !isValidEmail(email)) {
                 showNotification('Please enter a valid email address', 'error');
                 return;
             }
             
-            // Generate random 6-digit code
-            const code = Math.floor(100000 + Math.random() * 900000);
-            localStorage.setItem('verificationCode', code.toString());
-            localStorage.setItem('userEmail', email);
+            // Check if username is already taken (simulation)
+            const existingUsers = JSON.parse(localStorage.getItem('pikzelsUsers') || '[]');
+            if (existingUsers.some(user => user.username.toLowerCase() === username.toLowerCase())) {
+                showNotification('Username is already taken. Please choose another.', 'error');
+                return;
+            }
             
-            // Simulate sending email
-            showNotification('Verification code sent to your email!', 'success');
+            // Generate random 6-digit code
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            
+            // Store verification data
+            const verificationData = {
+                username: username,
+                email: email,
+                code: code,
+                timestamp: Date.now(),
+                attempts: 0
+            };
+            
+            localStorage.setItem('emailVerification', JSON.stringify(verificationData));
+            
+            // Show step 2
             document.getElementById('loginStep1').style.display = 'none';
             document.getElementById('loginStep2').style.display = 'block';
+            document.getElementById('verificationEmailDisplay').textContent = email;
+            
+            // Start resend timer
+            startResendTimer();
+            
+            // Simulate sending email
+            showNotification(`Verification code sent to ${email}! (Code: ${code} - for demo)`, 'success');
         }
 
         function verifyCode() {
-            const enteredCode = document.getElementById('verificationCode').value;
-            const storedCode = localStorage.getItem('verificationCode');
+            const verificationData = JSON.parse(localStorage.getItem('emailVerification') || '{}');
             
-            if (enteredCode === storedCode) {
-                const email = localStorage.getItem('userEmail');
-                simulateLogin(email, 'email');
-                showNotification('Login successful!', 'success');
-                closeLoginModal();
-            } else {
-                showNotification('Invalid verification code', 'error');
+            if (!verificationData.code) {
+                showNotification('Please request a verification code first', 'error');
+                return;
             }
+            
+            // Get entered code
+            const enteredCode = Array.from(document.querySelectorAll('.otp-input'))
+                .map(input => input.value)
+                .join('');
+            
+            if (enteredCode.length !== 6) {
+                showNotification('Please enter the complete 6-digit code', 'error');
+                return;
+            }
+            
+            // Check attempts
+            if (verificationData.attempts >= 3) {
+                showNotification('Too many failed attempts. Please request a new code.', 'error');
+                return;
+            }
+            
+            // Verify code
+            if (enteredCode === verificationData.code) {
+                // Code is correct
+                const newUser = {
+                    username: verificationData.username,
+                    email: verificationData.email,
+                    emailVerified: true,
+                    registrationDate: new Date().toISOString(),
+                    loginMethod: 'email'
+                };
+                
+                // Save user
+                saveUser(newUser);
+                currentUser = newUser;
+                isLoggedIn = true;
+                
+                // Show welcome screen
+                document.getElementById('loginStep2').style.display = 'none';
+                document.getElementById('loginStep3').style.display = 'block';
+                document.getElementById('welcomeUsername').textContent = newUser.username;
+                document.getElementById('welcomeEmail').textContent = newUser.email;
+                
+                // Clear verification data
+                localStorage.removeItem('emailVerification');
+                
+                showNotification('Account created successfully!', 'success');
+            } else {
+                // Incorrect code
+                verificationData.attempts++;
+                localStorage.setItem('emailVerification', JSON.stringify(verificationData));
+                
+                showNotification(`Invalid verification code. ${3 - verificationData.attempts} attempts remaining.`, 'error');
+                
+                // Clear inputs
+                document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+                document.getElementById('otp1').focus();
+            }
+        }
+
+        function completeLogin() {
+            updateNavigation();
+            closeLoginModal();
+            showNotification(`Welcome to PIKZELS NETWORK, ${currentUser.username}!`, 'success');
+        }
+
+        function resendCode() {
+            const verificationData = JSON.parse(localStorage.getItem('emailVerification') || '{}');
+            
+            if (!verificationData.email) {
+                showNotification('Please start the registration process again', 'error');
+                return;
+            }
+            
+            // Generate new code
+            const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+            verificationData.code = newCode;
+            verificationData.timestamp = Date.now();
+            verificationData.attempts = 0;
+            
+            localStorage.setItem('emailVerification', JSON.stringify(verificationData));
+            
+            // Clear OTP inputs
+            document.querySelectorAll('.otp-input').forEach(input => input.value = '');
+            document.getElementById('otp1').focus();
+            
+            // Start timer again
+            startResendTimer();
+            
+            showNotification(`New verification code sent! (Code: ${newCode} - for demo)`, 'success');
+        }
+
+        function startResendTimer() {
+            resendTimeLeft = 60;
+            document.getElementById('resendTimer').style.display = 'block';
+            
+            resendTimer = setInterval(() => {
+                resendTimeLeft--;
+                document.getElementById('timerCount').textContent = resendTimeLeft;
+                
+                if (resendTimeLeft <= 0) {
+                    clearInterval(resendTimer);
+                    document.getElementById('resendTimer').style.display = 'none';
+                }
+            }, 1000);
         }
 
         function backToStep1() {
             document.getElementById('loginStep1').style.display = 'block';
             document.getElementById('loginStep2').style.display = 'none';
+            
+            if (resendTimer) {
+                clearInterval(resendTimer);
+                resendTimer = null;
+            }
         }
 
-        function simulateLogin(username, method) {
+        function simulateLogin(username, email, method, emailVerified = false) {
+            const user = {
+                username: username,
+                email: email,
+                emailVerified: emailVerified,
+                registrationDate: new Date().toISOString(),
+                loginMethod: method
+            };
+            
+            saveUser(user);
+            currentUser = user;
             isLoggedIn = true;
-            currentUser = { username, method };
             updateNavigation();
+            closeLoginModal();
+            
+            if (!emailVerified) {
+                showEmailVerificationBanner();
+            }
         }
 
-        function updateNavigation() {
-            // Update login button to user menu
-            // This would be implemented in a real application
+        function saveUser(user) {
+            // Save current user
+            localStorage.setItem('pikzelsUser', JSON.stringify(user));
+            
+            // Add to users list
+            const users = JSON.parse(localStorage.getItem('pikzelsUsers') || '[]');
+            const existingIndex = users.findIndex(u => u.email === user.email);
+            
+            if (existingIndex >= 0) {
+                users[existingIndex] = user;
+            } else {
+                users.push(user);
+            }
+            
+            localStorage.setItem('pikzelsUsers', JSON.stringify(users));
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            currentUser = null;
+            localStorage.removeItem('pikzelsUser');
+            updateNavigation();
+            hideEmailVerificationBanner();
+            showNotification('Logged out successfully', 'success');
+        }
+
+        // Email Verification Functions
+        function showEmailVerificationBanner() {
+            document.getElementById('emailVerificationBanner').classList.add('show');
+        }
+
+        function hideEmailVerificationBanner() {
+            document.getElementById('emailVerificationBanner').classList.remove('show');
+        }
+
+        function verifyEmailAction() {
+            if (!currentUser) return;
+            
+            document.getElementById('currentEmailDisplay').textContent = currentUser.email;
+            document.getElementById('emailVerificationModal').style.display = 'flex';
+        }
+
+        function closeEmailVerificationModal() {
+            document.getElementById('emailVerificationModal').style.display = 'none';
+        }
+
+        function sendVerificationEmail() {
+            if (!currentUser) return;
+            
+            // Generate verification code
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            
+            // Store verification data
+            const verificationData = {
+                email: currentUser.email,
+                code: code,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('emailVerificationPending', JSON.stringify(verificationData));
+            
+            showNotification(`Verification email sent to ${currentUser.email}! (Code: ${code} - for demo)`, 'success');
+            closeEmailVerificationModal();
+            
+            // Simulate email verification (in real app, this would be done via email link)
+            setTimeout(() => {
+                if (confirm(`Email verification code: ${code}\nClick OK to verify (simulation)`)) {
+                    currentUser.emailVerified = true;
+                    saveUser(currentUser);
+                    updateNavigation();
+                    hideEmailVerificationBanner();
+                    showNotification('Email verified successfully!', 'success');
+                }
+            }, 2000);
+        }
+
+        function resendVerificationEmail() {
+            sendVerificationEmail();
+        }
+
+        function changeEmail() {
+            const newEmail = prompt('Enter your new email address:');
+            if (newEmail && isValidEmail(newEmail)) {
+                currentUser.email = newEmail;
+                currentUser.emailVerified = false;
+                saveUser(currentUser);
+                updateNavigation();
+                showNotification('Email address updated. Please verify your new email.', 'success');
+                closeEmailVerificationModal();
+            } else if (newEmail) {
+                showNotification('Please enter a valid email address', 'error');
+            }
         }
 
         // Payment System
@@ -937,6 +1502,12 @@
             if (!isLoggedIn) {
                 showNotification('Please login first to make purchases', 'error');
                 openLoginModal();
+                return;
+            }
+            
+            if (!currentUser.emailVerified) {
+                showNotification('Please verify your email before making purchases', 'warning');
+                verifyEmailAction();
                 return;
             }
             
@@ -959,6 +1530,12 @@
             if (!isLoggedIn) {
                 showNotification('Please login first to make purchases', 'error');
                 openLoginModal();
+                return;
+            }
+            
+            if (!currentUser.emailVerified) {
+                showNotification('Please verify your email before making purchases', 'warning');
+                verifyEmailAction();
                 return;
             }
             
